@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "871213891628",
+    "project_id": "placementtracker-4845b",
+    "storage_bucket": "placementtracker-4845b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:871213891628:android:806573f8a212cab3371189",
+        "android_client_info": {
+          "package_name": "com.example.placementtracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBD0EvPiltTXSh04EDTSbw5e1acudcKQGQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
