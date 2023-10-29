@@ -26,35 +26,40 @@ import com.example.placementtracker.firebase_auth.FirebaseAuthenticator
 
 class AuthViewModel:ViewModel() {
     private val repository = FirebaseAuthenticator()
+    var currentUser by mutableStateOf<FirebaseUser?>(null)
 
 
     init {
         println("Viewmodel started")
         Log.d(TAG,"Init Block of LoginViewModel")
-
+        getCurrentUser()
     }
 
     companion object{
         const val TAG="LoginViewModel"
+        const val ERROR_CODE_EMPTY_EMAIL = 1
+        const val ERROR_CODE_EMPTY_PASSWORD = 2
+        const val ERROR_CODE_PASSWORD_MISMATCH = 3
     }
 
     var stateLoginOrRegister= mutableStateOf(true)
         private set
-    private val _firebaseUser = MutableLiveData<FirebaseUser?>()
 
 
-    val currentUser get()=_firebaseUser
     private val eventsChannel = Channel<AllEvents>()
     val allEventsFlow = eventsChannel.receiveAsFlow()
 
-
+    var isLoggingIn = mutableStateOf(false)
+    var isSigningUp = mutableStateOf(false)
     fun signInUser(email:String,password:String)=viewModelScope.launch {
         when{
             email.isEmpty()->{
                 eventsChannel.send(AllEvents.ErrorCode(1))
+                isLoggingIn.value=false
             }
             password.isEmpty()->{
                 eventsChannel.send(AllEvents.ErrorCode(2))
+                isLoggingIn.value=false
             }
             else->{
                 actualSignInUser(email,password)
@@ -66,12 +71,15 @@ class AuthViewModel:ViewModel() {
         when{
             email.isEmpty()->{
                 eventsChannel.send(AllEvents.ErrorCode(1))
+                isSigningUp.value=false
             }
             password.isEmpty()->{
                 eventsChannel.send(AllEvents.ErrorCode(2))
+                isSigningUp.value=false
             }
             password !=confirmPass->{
                 eventsChannel.send(AllEvents.ErrorCode(3))
+                isSigningUp.value=false
             }
             else->{
                 actualSignUpUser(email, password)
@@ -83,13 +91,17 @@ class AuthViewModel:ViewModel() {
         try {
             val user=repository.signUpWithEmailPassword(email, password)
             user?.let {
-                _firebaseUser.postValue(it)
+                currentUser=it
                 eventsChannel.send(AllEvents.Message("Sign Up Success"))
+            }?: run {
+                eventsChannel.send(AllEvents.Error("Sign Up Failed"))
+                isSigningUp.value=false
             }
         }catch (e:Exception){
             val error = e.toString().split(":").toTypedArray()
             Log.d(TAG, "signInUser: ${error[1]}")
             eventsChannel.send(AllEvents.Error(error[1]))
+            isSigningUp.value=false
         }
     }
 
@@ -97,19 +109,23 @@ class AuthViewModel:ViewModel() {
         try{
             val user =repository.signInWithEmailPassword(email, password)
             user?.let {
-                _firebaseUser.postValue(it)
+                currentUser=it
                 eventsChannel.send(AllEvents.Message("Login Success"))
+            }?: run {
+                eventsChannel.send(AllEvents.Error("Login Failed"))
+                isLoggingIn.value=false
             }
         }catch (e:Exception){
             val error = e.toString().split(":").toTypedArray()
             Log.d(TAG,"signInUser: ${error[1]}")
             eventsChannel.send(AllEvents.Error(error[1]))
+            isLoggingIn.value=false
         }
     }
 
     fun getCurrentUser() = viewModelScope.launch {
         val user = repository.getCurrentUser()
-        _firebaseUser.postValue(user)
+        currentUser=user
     }
 
     fun verifySendPasswordReset(email: String){
@@ -141,5 +157,14 @@ class AuthViewModel:ViewModel() {
         data class Message(val message : String) : AllEvents()
         data class ErrorCode(val code : Int):AllEvents()
         data class Error(val error : String) : AllEvents()
+    }
+    fun getErrorMessage(errorCode: Int): String {
+        return when (errorCode) {
+            ERROR_CODE_EMPTY_EMAIL -> "Email cannot be empty"
+            ERROR_CODE_EMPTY_PASSWORD -> "Password cannot be empty"
+            ERROR_CODE_PASSWORD_MISMATCH -> "Passwords do not match"
+            // Add error messages for other error codes
+            else -> "An error occurred"
+        }
     }
 }

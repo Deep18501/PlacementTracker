@@ -1,8 +1,11 @@
 package com.example.placementtracker
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -15,10 +18,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.BlendMode.Companion.Color
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -32,6 +37,7 @@ import com.example.placementtracker.home_screens.Opportunities
 import com.example.placementtracker.home_screens.Settings
 import com.example.placementtracker.home_screens.StudentInfo
 import com.example.placementtracker.home_screens.StudentPlaced
+import com.example.placementtracker.ui.theme.Bluecolor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -95,13 +101,19 @@ fun BottomNavigationMaker(navController: NavController) {
         BottomNavItem.setting
     )
     NavigationBar(
-        containerColor = colorResource(id = R.color.teal_200),
+        modifier=Modifier
+            .clip(RoundedCornerShape(topStart = 16.dp,
+                topEnd = 16.dp,
+                bottomStart = 0.dp,
+                bottomEnd = 0.dp)),
+        containerColor = Bluecolor,
         contentColor = androidx.compose.ui.graphics.Color.Black
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
         items.forEach { item ->
             NavigationBarItem(
+                modifier = Modifier.padding(vertical = 15.dp, horizontal = 0.dp),
                 icon = { Image(painterResource(id = item.icon), contentDescription = item.title) },
                 alwaysShowLabel = true,
                 selected = currentRoute == item.screen_route,
