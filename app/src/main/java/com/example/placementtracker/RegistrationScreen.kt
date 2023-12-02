@@ -27,10 +27,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
@@ -57,13 +58,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -81,7 +79,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.placementtracker.ui.theme.Bluecolor
-import com.example.placementtracker.ui.theme.whiteGrey
 import com.example.placementtracker.viewmodels.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -149,7 +146,7 @@ fun RegistrationScreen(navController: NavHostController,authViewModel:AuthViewMo
     }
     var txtEmail by rememberSaveable { mutableStateOf("") }
     var txtName by rememberSaveable { mutableStateOf("") }
-    var txtPhone by rememberSaveable { mutableStateOf("") }
+    var txtRollNo by rememberSaveable { mutableStateOf("") }
     var txtPassword by rememberSaveable { mutableStateOf("") }
     var txtCPassword by rememberSaveable { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -319,9 +316,9 @@ fun RegistrationScreen(navController: NavHostController,authViewModel:AuthViewMo
                     )
                     if (!stateLoginOrRegister) {
                         OutlinedTextField(
-                            value = txtPhone,
-                            onValueChange = { txtPhone = it },
-                            label = { Text(text = "Phone No.") },
+                            value = txtRollNo,
+                            onValueChange = { txtRollNo = it },
+                            label = { Text(text = "Roll No") },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(8.dp)
@@ -333,8 +330,8 @@ fun RegistrationScreen(navController: NavHostController,authViewModel:AuthViewMo
                             maxLines = 1,
                             leadingIcon = {
                                 Icon(
-                                    imageVector = Icons.Default.Phone,
-                                    contentDescription = "Phone Icon"
+                                    imageVector = Icons.Default.Face,
+                                    contentDescription = "Face Icon"
                                 )
                             },
                             keyboardActions = KeyboardActions(
@@ -435,13 +432,14 @@ fun RegistrationScreen(navController: NavHostController,authViewModel:AuthViewMo
                                     text = "Login In",
                                     modifier = Modifier.padding(horizontal = 30.dp),
                                     style = MaterialTheme.typography.bodyMedium,
+                                    color= Color.White
                                 )
                             }
                         }
                     } else {
                         Button(
                             onClick = {
-                                authViewModel.signUpUser(txtEmail, txtPassword, txtCPassword)
+                                authViewModel.signUpUser(txtEmail,txtName,txtRollNo, txtPassword, txtCPassword)
                             },
                             colors = ButtonDefaults.buttonColors(Bluecolor),
                             modifier = Modifier
@@ -455,6 +453,7 @@ fun RegistrationScreen(navController: NavHostController,authViewModel:AuthViewMo
                                     text = "Sign Up",
                                     modifier = Modifier.padding(horizontal = 30.dp),
                                     style = MaterialTheme.typography.bodyMedium,
+                                    color= Color.White
                                 )
                             }
                         }

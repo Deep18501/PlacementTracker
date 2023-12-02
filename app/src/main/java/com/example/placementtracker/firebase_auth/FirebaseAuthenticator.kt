@@ -3,15 +3,26 @@ package com.example.placementtracker.firebase_auth
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
 class FirebaseAuthenticator(private val firebaseAuth: FirebaseAuth= Firebase.auth){
 
-    suspend fun signUpWithEmailPassword(email: String, password: String): FirebaseUser? {
+    suspend fun signUpWithEmailPassword(email: String,name: String,rollNo:String, password: String): FirebaseUser? {
         try {
             firebaseAuth.createUserWithEmailAndPassword(email, password).await()
-            return firebaseAuth.currentUser
+            val currentUser=Firebase.auth.currentUser
+            val db=Firebase.firestore
+            val user = hashMapOf(
+                "name" to name,
+                "email" to email
+            )
+            if (currentUser != null) {
+                db.collection("users").document(rollNo).set(user).await()
+            }
+
+            return currentUser
         } catch (e: Exception) {
             // Handle the exception, e.g., log it or return null
             return null

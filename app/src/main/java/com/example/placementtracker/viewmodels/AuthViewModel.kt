@@ -40,6 +40,8 @@ class AuthViewModel:ViewModel() {
         const val ERROR_CODE_EMPTY_EMAIL = 1
         const val ERROR_CODE_EMPTY_PASSWORD = 2
         const val ERROR_CODE_PASSWORD_MISMATCH = 3
+        const val ERROR_CODE_EMPTY_NAME = 4
+        const val ERROR_CODE_EMPTY_ROLLNO = 5
     }
 
     var stateLoginOrRegister= mutableStateOf(true)
@@ -67,7 +69,7 @@ class AuthViewModel:ViewModel() {
         }
     }
 
-    fun signUpUser(email: String,password: String,confirmPass:String)=viewModelScope.launch {
+    fun signUpUser(email: String,name:String,rollNo:String,password: String,confirmPass:String)=viewModelScope.launch {
         when{
             email.isEmpty()->{
                 eventsChannel.send(AllEvents.ErrorCode(1))
@@ -81,15 +83,23 @@ class AuthViewModel:ViewModel() {
                 eventsChannel.send(AllEvents.ErrorCode(3))
                 isSigningUp.value=false
             }
+            name.isEmpty()->{
+                eventsChannel.send(AllEvents.ErrorCode(4))
+                isSigningUp.value=false
+            }
+            rollNo.isEmpty()->{
+                eventsChannel.send(AllEvents.ErrorCode(5))
+                isSigningUp.value=false
+            }
             else->{
-                actualSignUpUser(email, password)
+                actualSignUpUser(email, name,rollNo,password)
             }
         }
     }
 
-    private fun actualSignUpUser(email: String, password: String) =viewModelScope.launch{
+    private fun actualSignUpUser(email: String,name:String,rollNo: String, password: String) =viewModelScope.launch{
         try {
-            val user=repository.signUpWithEmailPassword(email, password)
+            val user=repository.signUpWithEmailPassword(email,name,rollNo, password)
             user?.let {
                 currentUser=it
                 eventsChannel.send(AllEvents.Message("Sign Up Success"))
@@ -163,6 +173,8 @@ class AuthViewModel:ViewModel() {
             ERROR_CODE_EMPTY_EMAIL -> "Email cannot be empty"
             ERROR_CODE_EMPTY_PASSWORD -> "Password cannot be empty"
             ERROR_CODE_PASSWORD_MISMATCH -> "Passwords do not match"
+            ERROR_CODE_EMPTY_NAME -> "Enter your name"
+            ERROR_CODE_EMPTY_ROLLNO -> "Enter your roll no"
             // Add error messages for other error codes
             else -> "An error occurred"
         }
