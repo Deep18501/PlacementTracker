@@ -69,7 +69,7 @@ class AuthViewModel:ViewModel() {
         }
     }
 
-    fun signUpUser(email: String,name:String,rollNo:String,password: String,confirmPass:String)=viewModelScope.launch {
+    fun signUpUser(email: String,name:String,rollNo:String,branch: String,password: String,confirmPass:String)=viewModelScope.launch {
         when{
             email.isEmpty()->{
                 eventsChannel.send(AllEvents.ErrorCode(1))
@@ -92,14 +92,14 @@ class AuthViewModel:ViewModel() {
                 isSigningUp.value=false
             }
             else->{
-                actualSignUpUser(email, name,rollNo,password)
+                actualSignUpUser(email, name,rollNo,branch,password)
             }
         }
     }
 
-    private fun actualSignUpUser(email: String,name:String,rollNo: String, password: String) =viewModelScope.launch{
+    private fun actualSignUpUser(email: String,name:String,rollNo: String,branch:String, password: String) =viewModelScope.launch{
         try {
-            val user=repository.signUpWithEmailPassword(email,name,rollNo, password)
+            val user=repository.signUpWithEmailPassword(email,name,rollNo,branch, password)
             user?.let {
                 currentUser=it
                 eventsChannel.send(AllEvents.Message("Sign Up Success"))

@@ -37,7 +37,11 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -79,14 +83,15 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.placementtracker.ui.theme.Bluecolor
+import com.example.placementtracker.utils.toaster
 import com.example.placementtracker.viewmodels.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegistrationScreen(navController: NavHostController,authViewModel:AuthViewModel) {
+fun RegistrationScreen(navController: NavHostController, authViewModel: AuthViewModel) {
     val userState by rememberUpdatedState(authViewModel.currentUser)
 
-    var stateLoginOrRegister=authViewModel.stateLoginOrRegister.value
+    var stateLoginOrRegister = authViewModel.stateLoginOrRegister.value
 
     val eventsChannel = authViewModel.allEventsFlow
     val snackbarHostState = remember { SnackbarHostState() }
@@ -103,19 +108,21 @@ fun RegistrationScreen(navController: NavHostController,authViewModel:AuthViewMo
                     )
                 }
                 // Handle other events as needed
-                is AuthViewModel.AllEvents.Error->{
+                is AuthViewModel.AllEvents.Error -> {
                     snackbarHostState.showSnackbar(
                         message = event.error,
                         actionLabel = "Dismiss"
                     )
                 }
-                is AuthViewModel.AllEvents.ErrorCode->{
+
+                is AuthViewModel.AllEvents.ErrorCode -> {
                     val errorMessage = authViewModel.getErrorMessage(event.code)
                     snackbarHostState.showSnackbar(
                         message = errorMessage,
                         actionLabel = "Dismiss"
                     )
                 }
+
                 else -> {
                     snackbarHostState.showSnackbar(
                         message = "Some Unexpected Error Occured",
@@ -147,6 +154,7 @@ fun RegistrationScreen(navController: NavHostController,authViewModel:AuthViewMo
     var txtEmail by rememberSaveable { mutableStateOf("") }
     var txtName by rememberSaveable { mutableStateOf("") }
     var txtRollNo by rememberSaveable { mutableStateOf("") }
+    var txtbranch by rememberSaveable { mutableStateOf("") }
     var txtPassword by rememberSaveable { mutableStateOf("") }
     var txtCPassword by rememberSaveable { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -156,11 +164,11 @@ fun RegistrationScreen(navController: NavHostController,authViewModel:AuthViewMo
     val fRPassword = remember { FocusRequester() }
     val fRCPassword = remember { FocusRequester() }
     val fRPhone = remember { FocusRequester() }
-    var loginButton= remember { FocusRequester() }
+    var loginButton = remember { FocusRequester() }
 
-    var signUpButton= remember { FocusRequester() }
-    val showDialog =  remember { mutableStateOf(false) }
-    if(showDialog.value)
+    var signUpButton = remember { FocusRequester() }
+    val showDialog = remember { mutableStateOf(false) }
+    if (showDialog.value)
         CustomDialog(value = "", setShowDialog = {
             showDialog.value = it
         }) {
@@ -171,7 +179,9 @@ fun RegistrationScreen(navController: NavHostController,authViewModel:AuthViewMo
             SnackbarHost(hostState = snackbarHostState, modifier = Modifier.fillMaxWidth())
         }) {
 
-        Box(modifier = Modifier.fillMaxSize().padding(it), contentAlignment = Alignment.Center) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(it), contentAlignment = Alignment.Center) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
                 Image(
                     painter = painterResource(id = R.drawable.ic_logo),
@@ -339,6 +349,9 @@ fun RegistrationScreen(navController: NavHostController,authViewModel:AuthViewMo
                                     fRPassword.requestFocus()
                                 })
                         )
+                        Demo_ExposedDropdownMenuBox(){
+                            txtbranch=it
+                        }
                     }
                     OutlinedTextField(
                         value = txtPassword,
@@ -432,14 +445,21 @@ fun RegistrationScreen(navController: NavHostController,authViewModel:AuthViewMo
                                     text = "Login In",
                                     modifier = Modifier.padding(horizontal = 30.dp),
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color= Color.White
+                                    color = Color.White
                                 )
                             }
                         }
                     } else {
                         Button(
                             onClick = {
-                                authViewModel.signUpUser(txtEmail,txtName,txtRollNo, txtPassword, txtCPassword)
+                                authViewModel.signUpUser(
+                                    txtEmail,
+                                    txtName,
+                                    txtRollNo,
+                                    txtbranch,
+                                    txtPassword,
+                                    txtCPassword
+                                )
                             },
                             colors = ButtonDefaults.buttonColors(Bluecolor),
                             modifier = Modifier
@@ -453,7 +473,7 @@ fun RegistrationScreen(navController: NavHostController,authViewModel:AuthViewMo
                                     text = "Sign Up",
                                     modifier = Modifier.padding(horizontal = 30.dp),
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color= Color.White
+                                    color = Color.White
                                 )
                             }
                         }
@@ -551,4 +571,50 @@ fun CustomDialog(value: String, setShowDialog: (Boolean) -> Unit, setValue: (Str
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Demo_ExposedDropdownMenuBox(
+    results:(String)->Unit
+) {
+    val context = LocalContext.current
+    val branches = arrayOf("Others", "CSE", "ECE", "ME", "Civil", "EE", "Chemical")
+    var expanded by remember { mutableStateOf(false) }
+    var selectedText by remember { mutableStateOf(branches[0]) }
 
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = {
+                expanded = !expanded
+            }
+        ) {
+            TextField(
+                value = selectedText,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier.menuAnchor().fillMaxWidth()
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                branches.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(text = item) },
+                        onClick = {
+                            selectedText = item
+                            expanded = false
+                            results(item)
+                        }
+                    )
+                }
+            }
+        }
+    }
+}

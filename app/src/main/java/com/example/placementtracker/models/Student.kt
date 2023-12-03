@@ -1,10 +1,15 @@
 package com.example.placementtracker.models
 
+import android.net.Uri
+
 data class Student(
-    val userID: String,
-    val name: String,
+    var name: String,
     val email: String,
-    val phone: String,
+    var phone: String="",
+    val branch:String,
     val rollNo: String,
-    val uploadedDocuments: List<String>
+    var placed:Boolean=false,
+    var companyId:String="",
+    var description:String="Tell us about Yourself",
+    var uploadedDocuments: Uri= Uri.EMPTY
 )

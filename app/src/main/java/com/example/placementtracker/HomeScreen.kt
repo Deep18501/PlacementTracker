@@ -41,28 +41,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.placementtracker.home_screens.CompanyInfo
 import com.example.placementtracker.home_screens.HomeDashboard
 import com.example.placementtracker.home_screens.Opportunities
-import com.example.placementtracker.home_screens.Settings
 import com.example.placementtracker.home_screens.StudentInfo
 import com.example.placementtracker.home_screens.StudentPlaced
 import com.example.placementtracker.ui.theme.Bluecolor
 import com.example.placementtracker.ui.theme.GreyIcon
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HomeScreen() {
-    val navControllerInner = rememberNavController()
-    Surface(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Scaffold(
-            bottomBar = { BottomNavigationMaker(navController = navControllerInner) }
-        ) {
-
-            NavigationGraph(navController = navControllerInner, it)
-        }
-    }
-
-}
+import com.example.placementtracker.viewmodels.HomeScreenViewModel
 
 sealed class BottomNavItem(var title: String, var icon: Int, var screen_route: String) {
 
@@ -72,43 +55,18 @@ sealed class BottomNavItem(var title: String, var icon: Int, var screen_route: S
     object opts : BottomNavItem("Opportunities", R.drawable.ic_tasks, Routes.OPPORTUNITIES)
     object stdPlaced :
         BottomNavItem("Student Placed", R.drawable.ic_person_done, Routes.STUDENTS_PLACED)
-
-    object setting : BottomNavItem("Settings", R.drawable.ic_settings, Routes.SETTINGS)
 }
 
-@Composable
-fun NavigationGraph(navController: NavHostController, paddingValues: PaddingValues) {
-    NavHost(navController, startDestination = BottomNavItem.Home.screen_route) {
-        composable(Routes.HOME_DASHBOARD) {
-            HomeDashboard()
-        }
-        composable(Routes.COMPANY_INFO) {
-            CompanyInfo()
-        }
-        composable(Routes.STUDENT_INFO) {
-            StudentInfo()
-        }
-        composable(Routes.OPPORTUNITIES) {
-            Opportunities()
-        }
-        composable(Routes.STUDENTS_PLACED) {
-            StudentPlaced()
-        }
-        composable(Routes.SETTINGS) {
-            Settings()
-        }
-    }
-}
+
 
 @Composable
 fun BottomNavigationMaker(navController: NavController) {
     val items = listOf(
         BottomNavItem.Home,
         BottomNavItem.cmpInfo,
-        BottomNavItem.stdInfo,
-        BottomNavItem.opts,
         BottomNavItem.stdPlaced,
-        BottomNavItem.setting
+        BottomNavItem.opts,
+        BottomNavItem.stdInfo,
     )
     NavigationBar(
         modifier = Modifier
@@ -126,6 +84,7 @@ fun BottomNavigationMaker(navController: NavController) {
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
+
         Spacer(modifier = Modifier.height(20.dp))
         items.forEach { item ->
             NavigationBarItem(

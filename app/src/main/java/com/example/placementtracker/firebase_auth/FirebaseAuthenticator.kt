@@ -1,5 +1,6 @@
 package com.example.placementtracker.firebase_auth
 
+import com.example.placementtracker.models.Student
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -9,17 +10,21 @@ import kotlinx.coroutines.tasks.await
 
 class FirebaseAuthenticator(private val firebaseAuth: FirebaseAuth= Firebase.auth){
 
-    suspend fun signUpWithEmailPassword(email: String,name: String,rollNo:String, password: String): FirebaseUser? {
+    suspend fun signUpWithEmailPassword(email: String,name: String,rollNo:String, branch:String,password: String): FirebaseUser? {
         try {
             firebaseAuth.createUserWithEmailAndPassword(email, password).await()
             val currentUser=Firebase.auth.currentUser
             val db=Firebase.firestore
-            val user = hashMapOf(
-                "name" to name,
-                "email" to email
+            val user= Student(
+                name = name,
+                email=email,
+                branch = branch,
+                rollNo=rollNo,
+                placed = false,
             )
+
             if (currentUser != null) {
-                db.collection("users").document(rollNo).set(user).await()
+                db.collection("student").document(currentUser.uid).set(user).await()
             }
 
             return currentUser
