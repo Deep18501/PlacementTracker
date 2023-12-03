@@ -1,20 +1,26 @@
 package com.example.placementtracker.home_screens
 
 import android.content.Context
+import android.graphics.Typeface
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -27,10 +33,14 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -47,16 +57,25 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.placementtracker.R
 import com.example.placementtracker.Routes
 import com.example.placementtracker.models.Student
+import com.example.placementtracker.ui.theme.DarkBlue
+import com.example.placementtracker.ui.theme.LightBlue
+import com.example.placementtracker.ui.theme.whiteGrey
 import com.example.placementtracker.utils.toaster
 import com.example.placementtracker.viewmodels.HomeScreenViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -75,12 +94,12 @@ fun StudentInfo(
     var loadProfileDetails by remember { mutableIntStateOf(0) }
     var user by remember { mutableStateOf<Student?>(null) }
     var userProfile by remember { mutableStateOf<Student?>(null) }
+    var userCollection = Firebase.firestore.collection("student")
 
     LaunchedEffect(loadProfileDetails) {
         println("ImageUri is " + "Corutins Scope")
 
         user = viewModel.loadPersonDet()
-
         userProfile = user
     }
 
@@ -88,9 +107,19 @@ fun StudentInfo(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
             .fillMaxSize()
-            .background(Color.Red)
+            .background(whiteGrey)
     ) {
+    Row(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
+        Image(painter = painterResource(id = R.drawable.uni_logo), contentDescription = "uni logo", modifier = Modifier.size(50.dp))
 
+        Text(
+            text = "Student Profile",
+            style = MaterialTheme.typography.displaySmall,
+            fontFamily = FontFamily.Serif,
+            fontWeight = FontWeight(20),
+            modifier = Modifier.padding(start = 16.dp)
+        )
+    }
         userProfile?.let {
             ProfileInfoItem(
                 viewModel = viewModel,
@@ -104,7 +133,7 @@ fun StudentInfo(
             ) {
                 loadProfileDetails += 1
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(2.dp))
 
             ProfileInfoItem(
                 viewModel = viewModel,
@@ -118,11 +147,7 @@ fun StudentInfo(
             ) {
                 loadProfileDetails += 1
             }
-
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-
+            Spacer(modifier = Modifier.height(2.dp))
             ProfileInfoItem(
                 viewModel = viewModel,
                 context = context,
@@ -136,7 +161,7 @@ fun StudentInfo(
                 loadProfileDetails += 1
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(2.dp))
             ProfileInfoItem(
                 viewModel = viewModel,
                 context = context,
@@ -150,7 +175,7 @@ fun StudentInfo(
                 loadProfileDetails += 1
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(2.dp))
 
             ProfileInfoItem(
                 viewModel = viewModel,
@@ -164,7 +189,7 @@ fun StudentInfo(
             ) {
                 loadProfileDetails += 1
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(2.dp))
 
             ProfileInfoItem(
                 viewModel = viewModel,
@@ -179,16 +204,42 @@ fun StudentInfo(
                 loadProfileDetails += 1
             }
             Spacer(modifier = Modifier.height(8.dp))
-Button(onClick = {
-    viewModel.auth.signOut()
-    navController.navigate(Routes.LOGIN_SCREEN) {
-        this.popUpTo(Routes.LOGIN_SCREEN) {
-            inclusive = true
-        }
-    }
-}) {
-    Text("Logout")
-}
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Text(text = "Are You placed yet?")
+                Switch(
+                    checked = it.placed,
+                    onCheckedChange = {newplaced ->
+                        it.placed = newplaced
+                        viewModel.currentUser?.let { it1 ->
+                            updateFirebaseData(context = context, userCollection, it1, it) {
+                                loadProfileDetails += 1
+                            }
+                        }
+                    }
+                )
+
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Box (modifier = Modifier.fillMaxWidth() , contentAlignment = Alignment.Center){
+
+
+                Button(onClick = {
+                    viewModel.auth.signOut()
+                    navController.navigate(Routes.LOGIN_SCREEN) {
+                        this.popUpTo(Routes.LOGIN_SCREEN) {
+                            inclusive = true
+                        }
+                    }
+                }) {
+                    Text("Logout", fontSize = 20.sp)
+                }
+            }
         }
     }
 }
@@ -222,26 +273,30 @@ fun ProfileInfoItem(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 8.dp)
             .shadow(4.dp, shape = RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(8.dp)
+            .background(Color.White)
+
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.defaultMinSize(minHeight = 50.dp)
+            ) {
                 Icon(imageVector = icon, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = title, style = MaterialTheme.typography.bodySmall)
+                Text(text = title, style = MaterialTheme.typography.bodyMedium, fontFamily = FontFamily(typeface = Typeface.DEFAULT_BOLD))
             }
             if (editable) {
                 if (!editing) {
                     IconButton(onClick = {
                         editing = !editing
                     }) {
-                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
+                        Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit", modifier = Modifier.size(24.dp))
                     }
                 } else {
                     IconButton(onClick = {
@@ -253,19 +308,13 @@ fun ProfileInfoItem(
                             6 -> user.description = txt
                         }
                         if (currentUser != null) {
-                            userCollection.document(currentUser.uid).set(user)
-                                .addOnSuccessListener {
-                                    onDataEditing(1) // Callback with the edited field
-                                    Log.d("Data sent to Firebase", "Saved Successfully")
-                                    toaster(context, "Profile Updated Successfully")
-                                }
-                                .addOnFailureListener {
-                                    Log.d("Data sent to Firebase", "Not Saved Successfully")
-                                    toaster(context, "Failed To Update Profile")
-                                }
+                            updateFirebaseData(context,userCollection,currentUser,user){
+                                onDataEditing(it)
+                            }
                         }
+
                     }) {
-                        Icon(imageVector = Icons.Default.Check, contentDescription = "Done")
+                        Icon(imageVector = Icons.Default.Check, contentDescription = "Done", modifier = Modifier.size(24.dp))
                     }
                 }
             }
@@ -275,7 +324,8 @@ fun ProfileInfoItem(
             Text(
                 text = value,
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                fontSize = 18.sp,
+                modifier = Modifier.padding(start = 20.dp, bottom = 10.dp )
             )
         } else {
             // Use TextField for editing the value
@@ -284,9 +334,23 @@ fun ProfileInfoItem(
                 onValueChange = {
                     txt = it // Update txt immediately as the user types
                 }
+                , modifier = Modifier.padding(start = 20.dp, bottom = 10.dp )
             )
         }
     }
 }
 
+fun updateFirebaseData(context: Context,userCollection:CollectionReference,currentUser:FirebaseUser,user: Student,onDataEditing:(Int)->Unit){
+    userCollection.document(currentUser.uid).set(user)
+        .addOnSuccessListener {
+            onDataEditing(1) // Callback with the edited field
+            Log.d("Data sent to Firebase", "Saved Successfully")
+            toaster(context, "Profile Updated Successfully")
+        }
+        .addOnFailureListener {
+            Log.d("Data sent to Firebase", "Not Saved Successfully")
+            toaster(context, "Failed To Update Profile")
+        }
+
+}
 

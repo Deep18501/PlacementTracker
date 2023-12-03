@@ -13,3 +13,7 @@ val whiteGrey = Color(0xFFE0E0E0)
 val Bluecolor= Color(0xFF00428D)
 val GreyIcon= Color(0xFF758395)
 val LightBlue= Color(0xFF4cc2ff)
+
+val DarkBlue = Color(0xFF1100FF)
+val Blue = Color(0xFF0066FF)
+val Background = Color(0XFFEEEEEE)

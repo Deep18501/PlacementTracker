@@ -22,7 +22,7 @@ fun HomeDashboard() {
         .verticalScroll(rememberScrollState())
         .fillMaxSize()
         .background(Color.Red)){
-        Image(painter = painterResource(id = R.drawable.trial_dashboard),
+        Image(painter = painterResource(id = R.drawable.dash),
             contentDescription = null,
             contentScale = ContentScale.FillWidth,
             modifier = Modifier.fillMaxWidth(),

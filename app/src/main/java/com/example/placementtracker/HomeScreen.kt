@@ -1,59 +1,30 @@
 package com.example.placementtracker
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemColors
-import androidx.compose.material3.NavigationDrawerItemColors
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.focusModifier
-import androidx.compose.ui.graphics.BlendMode.Companion.Color
-import androidx.compose.ui.graphics.BlendMode.Companion.ColorBurn
-import androidx.compose.ui.graphics.BlendMode.Companion.Lighten
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
-import com.example.placementtracker.home_screens.CompanyInfo
-import com.example.placementtracker.home_screens.HomeDashboard
-import com.example.placementtracker.home_screens.Opportunities
-import com.example.placementtracker.home_screens.StudentInfo
-import com.example.placementtracker.home_screens.StudentPlaced
 import com.example.placementtracker.ui.theme.Bluecolor
-import com.example.placementtracker.ui.theme.GreyIcon
-import com.example.placementtracker.viewmodels.HomeScreenViewModel
 
 sealed class BottomNavItem(var title: String, var icon: Int, var screen_route: String) {
 
     object Home : BottomNavItem("Home", R.drawable.ic_home, Routes.HOME_DASHBOARD)
     object cmpInfo : BottomNavItem("Company Info", R.drawable.ic_dept, Routes.COMPANY_INFO)
     object stdInfo : BottomNavItem("Student Info", R.drawable.ic_person, Routes.STUDENT_INFO)
-    object opts : BottomNavItem("Opportunities", R.drawable.ic_tasks, Routes.OPPORTUNITIES)
-    object stdPlaced :
+    object studentApplications : BottomNavItem("Opportunities", R.drawable.ic_tasks, Routes.OPPORTUNITIES)
+    object companies :
         BottomNavItem("Student Placed", R.drawable.ic_person_done, Routes.STUDENTS_PLACED)
 }
 
@@ -64,8 +35,8 @@ fun BottomNavigationMaker(navController: NavController) {
     val items = listOf(
         BottomNavItem.Home,
         BottomNavItem.cmpInfo,
-        BottomNavItem.stdPlaced,
-        BottomNavItem.opts,
+        BottomNavItem.companies,
+        BottomNavItem.studentApplications,
         BottomNavItem.stdInfo,
     )
     NavigationBar(

@@ -1,8 +1,11 @@
 package com.example.placementtracker.models
 
-data class Applications(
+import com.google.firebase.Timestamp
+import com.google.firebase.ktx.Firebase
+
+data class CompanyApplications(
     val jobProfileId: String,
     val companyId:String,
-    val startDate:String,
-    val endDate:String?
+    val startDate:Timestamp,
+    val endDate:Timestamp
 )
