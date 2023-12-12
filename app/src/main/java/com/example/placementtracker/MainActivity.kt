@@ -3,8 +3,6 @@ package com.example.placementtracker
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,7 +16,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -44,7 +41,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
                     NavHost(
-                        navController = navController as NavHostController,
+                        navController = navController,
                         startDestination = Routes.LOGIN_SCREEN
                     ) {
                         composable(Routes.LOGIN_SCREEN){
@@ -56,13 +53,13 @@ class MainActivity : ComponentActivity() {
 
                             composable(Routes.HOME_DASHBOARD) {
                                 BottomNavigationLayout(navController = navController) {
-                                    HomeDashboard()
+                                    HomeDashboard(navController = navController)
                                 }
                             }
                             composable(Routes.COMPANY_INFO) {
-                                BottomNavigationLayout(navController = navController) {
-                                    CompanyInfo()
-                                }
+                                    BottomNavigationLayout(navController = navController) {
+                                        CompanyInfo(navController)
+                                    }
                             }
                             composable(Routes.STUDENT_INFO) {
                                 val viewModel= HomeScreenViewModel()
@@ -81,6 +78,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
                         }
+
                     }
                 }
             }
@@ -119,6 +117,8 @@ object Routes {
     const val LOGIN_SCREEN="login_screen"
     const val HOME_DASHBOARD="home_dashboard"
     const val COMPANY_INFO="company_info"
+    const val COMPANY_INFO_HOME="company_info_home"
+    const val COMPANY_INFO_DETAILS="company_info_det"
     const val STUDENT_INFO="student_info"
     const val OPPORTUNITIES="Opportunities"
     const val STUDENTS_PLACED="student_placed"
