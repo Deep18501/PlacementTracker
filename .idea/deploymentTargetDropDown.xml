@@ -5,24 +5,27 @@
       <entry key="BarChartPreview">
         <State />
       </entry>
-      <entry key="CompanyCard">
+      <entry key="BranchPlacementsScreen">
+        <State />
+      </entry>
+      <entry key="TestingBack">
+        <State />
+      </entry>
+      <entry key="app">
         <State>
-          <runningDeviceTargetSelectedWithDropDown>
+          <multipleDevicesSelectedInDropDown value="true" />
+          <runningDeviceTargetsSelectedWithDialog>
             <Target>
               <type value="RUNNING_DEVICE_TARGET" />
               <deviceKey>
                 <Key>
-                  <type value="SERIAL_NUMBER" />
-                  <value value="ba418e5a" />
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\deepa\.android\avd\Pixel_6.4.avd" />
                 </Key>
               </deviceKey>
             </Target>
-          </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2023-12-02T17:28:17.799760Z" />
+          </runningDeviceTargetsSelectedWithDialog>
         </State>
-      </entry>
-      <entry key="app">
-        <State />
       </entry>
       <entry key="test">
         <State />

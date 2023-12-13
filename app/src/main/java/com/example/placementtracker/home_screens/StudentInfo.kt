@@ -399,7 +399,6 @@ fun updateFirebaseData(
         }
         .addOnFailureListener {
             Log.d("Data sent to Firebase", "Not Saved Successfully")
-            toaster(context, "Failed To Update Profile")
         }
 
 }
@@ -581,12 +580,18 @@ suspend fun setStudentPlacement(
     packageGot: String,
     year: String
 ) {
-    val placementCollection = Firebase.firestore.collection("studentPlaced")
-    val det = hashMapOf(
-        "name" to name,
-        "compName" to compName,
-        "package" to packageGot,
-        "year" to year
-    )
-    placementCollection.document(rollNo).set(det).await()
+    try {
+
+
+        val placementCollection = Firebase.firestore.collection("studentPlaced")
+        val det = hashMapOf(
+            "name" to name,
+            "compName" to compName,
+            "package" to packageGot,
+            "year" to year
+        )
+        placementCollection.document(rollNo).set(det).await()
+    }catch (e:Exception){
+        e.printStackTrace()
+    }
 }

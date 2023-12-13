@@ -238,7 +238,7 @@ suspend fun fetchApplications(context: Context): List<CompanyApplications> {
 
             val companyApplication = endDate?.let {
                 CompanyApplications(
-                    jobProfileId = jobProfileId,
+                    jobId = jobProfileId,
                     companyId = companyId,
                     startDate = startDate,
                     endDate = it,
@@ -270,7 +270,7 @@ suspend fun fetchCompList(
 
         applicationsList.forEach { appli ->
             val documentSnapshot = CollectionCompanies.document(appli.companyId).get().await()
-            val jobSnapshot = CollectionJobs.document(appli.jobProfileId).get().await()
+            val jobSnapshot = CollectionJobs.document(appli.jobId).get().await()
             if (documentSnapshot.exists()) {
                 if (jobSnapshot.exists()) {
                     val compIndustry = documentSnapshot.getString("industry").toString()

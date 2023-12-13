@@ -1,6 +1,10 @@
 package com.example.placementtracker.home_screens
 
 
+import android.Manifest
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -19,7 +23,9 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -47,18 +53,33 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.numberplatedetectionaoo.data.entity.PushNotification
 import com.example.placementtracker.R
 import com.example.placementtracker.Routes
 import com.example.placementtracker.models.Statics
+import com.example.placementtracker.repository.RetrofitInstance
+import com.example.placementtracker.teacher_screens.BranchPlacementsScreen
 import com.example.placementtracker.ui.theme.SkyBlue
 import com.example.placementtracker.ui.theme.backgroundGrey
+import com.example.placementtracker.utils.Constants.Companion.NOTIFICATION_TAG
+import com.example.placementtracker.utils.FirebaseMessagingNotificationPermissionDialog
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 @Composable
 fun HomeDashboard(
     navController: NavController
 ) {
+
+
     var dashboardData by remember {
         mutableStateOf<Statics>(Statics())
     }
@@ -82,6 +103,8 @@ fun HomeDashboard(
         Modifier
             .fillMaxSize()
             .background(backgroundGrey)
+            .verticalScroll(enabled = true, state = rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
             Modifier
@@ -122,7 +145,9 @@ fun HomeDashboard(
             text = "Total Placement Record",
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         )
         CircularProgressBar(
             percent = dashboardData.numberOfPlacements.toFloat() / dashboardData.numberOfStudent.toFloat(),
@@ -130,8 +155,18 @@ fun HomeDashboard(
         ) {
             navController.navigate(Routes.STUDENTS_PLACED)
         }
+        Text(
+            text = "Branch-Wise Record",
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        )
+        BranchPlacementsScreen()
     }
 }
+
 
 
 suspend fun getNumberOfDocuments(collectionPath: String): Int {

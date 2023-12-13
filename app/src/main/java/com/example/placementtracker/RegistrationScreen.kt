@@ -174,7 +174,11 @@ fun RegistrationScreen(navController: NavHostController, authViewModel: AuthView
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState, modifier = Modifier.fillMaxWidth())
         }) {
-
+        Box(modifier = Modifier.fillMaxSize().padding(bottom = 50.dp), contentAlignment = Alignment.BottomCenter){
+            Text(text = "Login as a Teacher ", modifier = Modifier.clickable {
+                navController.navigate(Routes.TEACHER_LOGIN_SCREEN)
+            })
+        }
         Box(modifier = Modifier
             .fillMaxSize()
             .padding(it), contentAlignment = Alignment.Center) {

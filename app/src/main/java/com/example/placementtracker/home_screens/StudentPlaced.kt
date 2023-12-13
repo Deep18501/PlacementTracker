@@ -58,7 +58,7 @@ enum class SortableColumns {
     NAME,
     ROLL_NO,
     PACKAGE,
-    YEAR,
+    YEAR
 }
 @Composable
 fun StudentPlaced() {
@@ -273,7 +273,6 @@ suspend fun fetchAllPlacement(context: Context): List<Placement> {
         }
     }catch (e:Exception){
         e.printStackTrace()
-        toaster(context,e.toString())
     }
     return applicationsList
 
@@ -309,5 +308,7 @@ private fun sortBy(placementList: List<Placement>, column: SortableColumns, orde
                 placementList.sortedByDescending { it.year.toInt() }
             }
         }
+
+
     }
 }

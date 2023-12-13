@@ -158,7 +158,7 @@ fun CompanyCard(
                     fontWeight = FontWeight(400),
                     fontSize = 14.sp
                 )
-                Text(text = "Skills :- " + jobSkills)
+                Text(text = "Skills :- $jobSkills")
 //                if (applied){
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = "Applied", color = Color.Blue)
@@ -216,7 +216,7 @@ suspend fun getAllApplicationOfStudent(uid: String): List<CompaniesListInfo> {
                 val appId = document.id
                 val companyApplication = endDate?.let {
                     CompanyApplications(
-                        jobProfileId = jobProfileId,
+                        jobId = jobProfileId,
                         companyId = companyId,
                         startDate = startDate,
                         endDate = it,
